@@ -1,0 +1,60 @@
+service: code-challenge-5
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: eu-west-2
+
+custom:
+  export-env:
+    overwrite: true
+
+  exportOutputs:
+    include:
+      - AwsRegion
+      - ApiUrl
+    output:
+      file: ./.env-outputs
+
+functions:
+  add-todo:
+    handler: functions/add-todo.handler
+    environment:
+      TODOS_TABLE_NAME: !Ref TodosTable
+    events:
+      - http:
+          path: /todos
+          method: post
+          request:
+            schemas:
+              application/json: ${file(schemas/add-todo.json)}
+    iamRoleStatements:
+      - Effect: Allow
+        Action: dynamodb:PutItem
+        Resource: !GetAtt TodosTable.Arn
+
+resources:
+  Resources:
+    TodosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+
+  Outputs:
+    AwsRegion:
+      Value: ${aws:region}
+
+    ApiUrl:
+      Value: !Sub https://${ApiGatewayRestApi}.execute-api.${aws:region}.amazonaws.com/${sls:stage}
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-export-env
+  - serverless-export-outputs
