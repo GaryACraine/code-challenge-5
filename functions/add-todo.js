@@ -1,6 +1,7 @@
 const DynamoDB = require('aws-sdk/clients/dynamodb')
 const DocumentClient = new DynamoDB.DocumentClient()
 const chance = require('chance').Chance()
+const { response } = require('../lib/http_help')
 
 const { TODOS_TABLE_NAME } = process.env
 
@@ -11,16 +12,15 @@ const { TODOS_TABLE_NAME } = process.env
  */
 module.exports.handler = async (event) => {
   const newTodo = JSON.parse(event.body)
-  // do some validation on payload, etc.
+  // const { username } = event.identity
 
   newTodo.id = chance.guid()
+  // newTodo.username = username
+
   await DocumentClient.put({
     TableName: TODOS_TABLE_NAME,
     Item: newTodo
   }).promise()
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify(newTodo)
-  }
+  return response(200, newTodo);
 }

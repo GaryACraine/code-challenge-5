@@ -54,6 +54,57 @@ functions:
         Action: dynamodb:PutItem
         Resource: !GetAtt TodosTable.Arn
 
+  get-todo:
+    handler: functions/get-todo.handler
+    environment:
+      TODOS_TABLE_NAME: !Ref TodosTable
+    events:
+      - http:
+          path: /todos/{id}
+          method: get
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: !GetAtt CognitoUserPool.Arn
+    iamRoleStatements:
+      - Effect: Allow
+        Action: dynamodb:GetItem
+        Resource: !GetAtt TodosTable.Arn
+
+  delete-todo:
+    handler: functions/delete-todo.handler
+    environment:
+      TODOS_TABLE_NAME: !Ref TodosTable
+    events:
+      - http:
+          path: /todos/{id}
+          method: delete
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: !GetAtt CognitoUserPool.Arn
+    iamRoleStatements:
+      - Effect: Allow
+        Action: dynamodb:DeleteItem
+        Resource: !GetAtt TodosTable.Arn
+
+  update-todo:
+    handler: functions/update-todo.handler
+    environment:
+      TODOS_TABLE_NAME: !Ref TodosTable
+    events:
+      - http:
+          path: /todos/{id}
+          method: put
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: !GetAtt CognitoUserPool.Arn
+    iamRoleStatements:
+      - Effect: Allow
+        Action: dynamodb:PutItem
+        Resource: !GetAtt TodosTable.Arn
+
 resources:
   Resources:
     TodosTable:
