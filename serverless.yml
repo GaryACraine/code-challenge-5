@@ -28,6 +28,8 @@ custom:
     include:
       - AwsRegion
       - ApiUrl
+      - CognitoUserPoolId
+      - CognitoWebClientId
     output:
       file: ./.env-outputs
 
@@ -40,6 +42,10 @@ functions:
       - http:
           path: /todos
           method: post
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: !GetAtt CognitoUserPool.Arn
           request:
             schemas:
               application/json: ${file(schemas/add-todo.json)}
@@ -61,12 +67,47 @@ resources:
           - AttributeName: id
             AttributeType: S
 
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        AutoVerifiedAttributes:
+          - email
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: false
+            RequireNumbers: false
+            RequireUppercase: false
+            RequireSymbols: false
+        UsernameAttributes:
+          - email
+
+    WebUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        UserPoolId: !Ref CognitoUserPool
+        ClientName: web
+        ExplicitAuthFlows:
+          - ALLOW_USER_SRP_AUTH
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+        PreventUserExistenceErrors: ENABLED
+
+
   Outputs:
     AwsRegion:
       Value: ${aws:region}
 
     ApiUrl:
       Value: !Sub https://${ApiGatewayRestApi}.execute-api.${aws:region}.amazonaws.com/${sls:stage}
+
+    CognitoUserPoolId:
+      Value: !Ref CognitoUserPool
+
+    CognitoWebClientId:
+      Value: !Ref WebUserPoolClient
+
+
 plugins:
   - serverless-iam-roles-per-function
   - serverless-export-env

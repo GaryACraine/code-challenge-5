@@ -1,29 +1,39 @@
 const APP_ROOT = '../../'
-// const AWS = require('aws-sdk')
-// const ApiGateway = new AWS.APIGateway()
-// const aws4 = require('aws4')
-// const URL = require('url')
+const AWS = require('aws-sdk')
+const ApiGateway = new AWS.APIGateway()
+const aws4 = require('aws4')
+const URL = require('url')
 const http = require('axios')
 
 const { TEST_MODE } = process.env
 
+const getApiKey = async () => {
+  const result = await ApiGateway.getApiKey({
+    apiKey: process.env.DefaultApiKeyId,
+    includeValue: true
+  }).promise()
 
-const viaHandler = async (event, functionName) => {
-  const handler = require(`${APP_ROOT}/functions/${functionName}`).handler
+  return result.value
+}
 
-  const context = {}
-  const response = await handler(event, context)
-  const headers = response?.headers || {}
-  const contentType = headers['content-type'] || 'application/json'
-  if (response?.body && contentType === 'application/json') {
-    response.body = JSON.parse(response.body)
+const signHttpRequest = (url, method, headers, body) => {
+  const urlData = URL.parse(url)
+  const opts = {
+    host: urlData.hostname,
+    path: urlData.pathname,
+    method,
+    headers,
+    body,
   }
-  return response
+
+  aws4.sign(opts)
+  return opts.headers
 }
 
 const viaHttp = async (relPath, method, opts) => {
   const url = `${process.env.ApiUrl}/${relPath}`
   console.info(`invoking via HTTP ${method} ${url}`)
+  console.info(`with options ${opts}`)
 
   try {
     let headers = {}
@@ -67,14 +77,28 @@ const viaHttp = async (relPath, method, opts) => {
   }
 }
 
-const we_invoke_add_todo = async (todo) => {
+const viaHandler = async (event, functionName) => {
+  const handler = require(`${APP_ROOT}/functions/${functionName}`).handler
+
+  const context = {}
+  const response = await handler(event, context)
+  const headers = response?.headers || {}
+  const contentType = headers['content-type'] || 'application/json'
+  if (response?.body && contentType === 'application/json') {
+    response.body = JSON.parse(response.body)
+  }
+  return response
+}
+
+const we_invoke_add_todo = async (todo, user) => {
   const body = JSON.stringify(todo)
   switch (TEST_MODE) {
     case 'integration':
       return await viaHandler({ body }, 'add-todo')
     case 'e2e':
-      // return await viaHttp('todos', 'POST', { body, iam_auth: true })
-      return await viaHttp('todos', 'POST', { body })
+      const auth = user.idToken
+      return await viaHttp('todos', 'POST', { body, auth })
+
     default:
       throw new Error(`TEST_MODE [${TEST_MODE}] is not supported`)
   }
