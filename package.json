@@ -5,7 +5,10 @@
   "main": "index.js",
   "private": "true",
   "scripts": {
-    "sls": "serverless"
+    "sls": "serverless",
+    "deployDev": "sls deploy --stage dev --region eu-west-1",
+    "export-env": "sls export-env --all",
+    "test:e2e": "npm run export-env && cross-env TEST_MODE=e2e jest --group=e2e"
   },
   "repository": {
     "type": "git",
