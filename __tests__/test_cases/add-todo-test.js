@@ -26,7 +26,7 @@ describe('Given an authorized user', () => {
   })
 
   it('POST /todos should add a todo', async () => {
-    const todo = { name: todoName }
+    const todo = { reminder: todoName }
     const result = await when.we_invoke_add_todo(todo, user)
 
     expect(result.statusCode).toEqual(200)
@@ -37,14 +37,14 @@ describe('Given an authorized user', () => {
     await then.todo_exists_in_dynamodb(todoId)
   })
 
-  it('POST /todos should return 400 if "name" is missing', async () => {
+  it('POST /todos should return 400 if "reminder" is missing', async () => {
     const result = await when.we_invoke_add_todo({ }, user)
 
     expect(result.statusCode).toEqual(500)
   })
 
-  it('POST /todos should return 400 if "name" is null', async () => {
-    const result = await when.we_invoke_add_todo({ name: null }, user)
+  it('POST /todos should return 400 if "reminder" is null', async () => {
+    const result = await when.we_invoke_add_todo({ reminder: null }, user)
 
     expect(result.statusCode).toEqual(500)
   })

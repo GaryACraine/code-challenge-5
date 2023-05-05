@@ -3,9 +3,9 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Add Todo Schema",
-  "required": ["name"],
+  "required": ["reminder"],
   "properties": {
-    "name": {
+    "reminder": {
       "type": "string"
     }
   }

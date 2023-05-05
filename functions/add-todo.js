@@ -13,7 +13,7 @@ const { TODOS_TABLE_NAME } = process.env;
 module.exports.handler = async (event) => {
   const newTodo = JSON.parse(event.body);
   // const { username } = event.identity
-  if (!newTodo.name) {
+  if (!newTodo.reminder) {
     return response(500, { message: "Error deleting item" });
   }
 
