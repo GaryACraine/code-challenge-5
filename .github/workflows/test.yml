@@ -1,0 +1,45 @@
+name: deploy test
+
+on:
+  workflow_run:
+    workflows:
+      - deploy dev
+    types:
+      - completed
+
+jobs:
+  deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # only run if the dev deployment succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '14'
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@master
+      with:
+        aws-region: eu-west-1
+        role-to-assume: arn:aws:iam::959710271722:role/GithubActionsRole
+        role-session-name: GithubActionsSession
+
+    - name: npm ci
+      run: npm ci
+
+    - name: deploy to test
+      run: npx sls deploy -s test
+
+    # - name: notify slack
+    #   uses: rtCamp/action-slack-notify@v2
+    #   env:
+    #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    #     SLACK_USERNAME: GH Actions
+    #     SLACK_MESSAGE: 'Deployed to test :rocket:'
+    #     SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
