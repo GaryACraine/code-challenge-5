@@ -114,7 +114,7 @@ const we_invoke_list_todos = async (count, nextToken, user) => {
       return await viaHandler({ queryStringParameters }, 'list-restaurants')
     case 'e2e':
       const auth = user.idToken
-      let url = 'restaurants'
+      let url = 'todos'
       if (count || nextToken) {
         // '' is required here, otherwise, it prints 'undefined'
         url += `?count=${count || ''}&nextToken=${nextToken || ''}`

@@ -105,6 +105,28 @@ functions:
         Action: dynamodb:PutItem
         Resource: !GetAtt TodosTable.Arn
 
+  list-todos:
+    handler: functions/list-todos.handler
+    environment:
+      TODOS_TABLE_NAME: !Ref TodosTable
+    events:
+      - http:
+          path: /todos
+          method: get
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: !GetAtt CognitoUserPool.Arn
+          request:
+            parameters:
+              querystrings:
+                count: false
+                nextToken: false
+    iamRoleStatements:
+      - Effect: Allow
+        Action: dynamodb:Scan
+        Resource: !GetAtt TodosTable.Arn
+
 resources:
   Resources:
     TodosTable:
