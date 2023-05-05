@@ -111,7 +111,7 @@ const we_invoke_list_todos = async (count, nextToken, user) => {
         count: count ? count.toString() : undefined,
         nextToken
       }
-      return await viaHandler({ queryStringParameters }, 'list-restaurants')
+      return await viaHandler({ queryStringParameters }, 'list-todos')
     case 'e2e':
       const auth = user.idToken
       let url = 'todos'
