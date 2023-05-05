@@ -8,7 +8,9 @@
     "sls": "serverless",
     "deployDev": "sls deploy --stage dev --region eu-west-1",
     "export-env": "sls export-env --all",
-    "test:e2e": "npm run export-env && cross-env TEST_MODE=e2e jest --group=e2e"
+    "test:int": "npm run export-env && cross-env TEST_MODE=integration jest --group=integration",
+    "test:e2e": "npm run export-env && cross-env TEST_MODE=e2e jest --group=e2e",
+    "test:all": "npm run test:int && npm run test:e2e"
   },
   "repository": {
     "type": "git",
