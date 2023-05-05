@@ -104,7 +104,31 @@ const we_invoke_add_todo = async (todo, user) => {
   }
 }
 
+const we_invoke_list_todos = async (count, nextToken, user) => {
+  switch (TEST_MODE) {
+    case 'integration':
+      const queryStringParameters = {
+        count: count ? count.toString() : undefined,
+        nextToken
+      }
+      return await viaHandler({ queryStringParameters }, 'list-restaurants')
+    case 'e2e':
+      const auth = user.idToken
+      let url = 'restaurants'
+      if (count || nextToken) {
+        // '' is required here, otherwise, it prints 'undefined'
+        url += `?count=${count || ''}&nextToken=${nextToken || ''}`
+      }
+
+      return await viaHttp(url, 'GET', { auth })
+    default:
+      throw new Error(`TEST_MODE [${TEST_MODE}] is not supported`)
+  }
+}
+
+
 
 module.exports = {
-  we_invoke_add_todo
+  we_invoke_add_todo,
+  we_invoke_list_todos
 }
