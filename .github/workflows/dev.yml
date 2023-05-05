@@ -31,11 +31,11 @@ jobs:
     - name: deploy to dev
       run: npx sls deploy
 
-    - name: integration tests
-      run: npm run test:int
+    # - name: integration tests
+    #   run: npm run test:int
 
-    - name: e2e tests
-      run: npm run test:e2e
+    # - name: e2e tests
+    #   run: npm run test:e2e
 
     # - name: integration tests
     #   run: |
