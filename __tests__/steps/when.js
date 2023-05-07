@@ -104,6 +104,20 @@ const we_invoke_add_todo = async (todo, user) => {
   }
 }
 
+const we_invoke_update_todo = async (todo, user) => {
+  const body = JSON.stringify(todo)
+  switch (TEST_MODE) {
+    case 'integration':
+      return await viaHandler({ body }, 'update-todo')
+    case 'e2e':
+      const auth = user.idToken
+      return await viaHttp('todos', 'PUT', { body, auth })
+
+    default:
+      throw new Error(`TEST_MODE [${TEST_MODE}] is not supported`)
+  }
+}
+
 const we_invoke_list_todos = async (count, nextToken, user) => {
   switch (TEST_MODE) {
     case 'integration':
@@ -126,9 +140,8 @@ const we_invoke_list_todos = async (count, nextToken, user) => {
   }
 }
 
-
-
 module.exports = {
   we_invoke_add_todo,
+  we_invoke_update_todo,
   we_invoke_list_todos
 }

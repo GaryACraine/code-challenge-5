@@ -26,7 +26,7 @@ describe('Given an authorized user', () => {
   })
 
   it('POST /todos should add a todo', async () => {
-    const todo = { reminder: todoName }
+    const todo = { reminder: todoName, completed: false }
     const result = await when.we_invoke_add_todo(todo, user)
 
     expect(result.statusCode).toEqual(200)

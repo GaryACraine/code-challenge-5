@@ -94,7 +94,7 @@ functions:
       TODOS_TABLE_NAME: !Ref TodosTable
     events:
       - http:
-          path: /todos/{id}
+          path: /todos
           method: put
           authorizer:
             name: CognitoAuthorizer
@@ -102,7 +102,7 @@ functions:
             arn: !GetAtt CognitoUserPool.Arn
     iamRoleStatements:
       - Effect: Allow
-        Action: dynamodb:PutItem
+        Action: dynamodb:UpdateItem
         Resource: !GetAtt TodosTable.Arn
 
   list-todos:

@@ -41,12 +41,14 @@ describe('Given at least two todos in the database', () => {
   beforeAll(async () => {
     await given.todo_exists_in_dynamodb({
       id: chance.guid(),
-      name: chance.string({ length: 16 })
+      name: chance.string({ length: 16 }),
+      completed: false
     })
 
     await given.todo_exists_in_dynamodb({
       id: chance.guid(),
-      name: chance.string({ length: 16 })
+      name: chance.string({ length: 16 }),
+      completed: false
     })
 
     if (TEST_MODE === 'e2e') {
