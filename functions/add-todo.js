@@ -14,7 +14,7 @@ module.exports.handler = async (event) => {
   const newTodo = JSON.parse(event.body);
   // const { username } = event.identity
   if (!newTodo.reminder) {
-    return response(500, { message: "Error deleting item" });
+    return response(400, { message: "Reminder must be specified" });
   }
 
   newTodo.id = chance.guid();

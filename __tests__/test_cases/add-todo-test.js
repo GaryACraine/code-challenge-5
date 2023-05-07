@@ -40,13 +40,13 @@ describe('Given an authorized user', () => {
   it('POST /todos should return 400 if "reminder" is missing', async () => {
     const result = await when.we_invoke_add_todo({ }, user)
 
-    expect(result.statusCode).toEqual(500)
+    expect(result.statusCode).toEqual(400)
   })
 
   it('POST /todos should return 400 if "reminder" is null', async () => {
     const result = await when.we_invoke_add_todo({ reminder: null }, user)
 
-    expect(result.statusCode).toEqual(500)
+    expect(result.statusCode).toEqual(400)
   })
 
 
