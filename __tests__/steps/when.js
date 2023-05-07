@@ -140,8 +140,26 @@ const we_invoke_list_todos = async (count, nextToken, user) => {
   }
 }
 
+const we_invoke_delete_todo = async (id, user) => {
+  switch (TEST_MODE) {
+    case 'integration':
+      const pathParameters = {
+        id
+      }
+      return await viaHandler({ pathParameters }, 'delete-todo')
+    case 'e2e':
+      const auth = user.idToken
+      let url = `todos/${id}`
+
+      return await viaHttp(url, 'DELETE', { auth })
+    default:
+      throw new Error(`TEST_MODE [${TEST_MODE}] is not supported`)
+  }
+}
+
 module.exports = {
   we_invoke_add_todo,
   we_invoke_update_todo,
+  we_invoke_delete_todo,
   we_invoke_list_todos
 }
