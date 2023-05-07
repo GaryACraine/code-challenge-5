@@ -12,7 +12,12 @@ const { TODOS_TABLE_NAME } = process.env;
  */
 module.exports.handler = async (event) => {
   const newTodo = JSON.parse(event.body);
-  const { username } = event.identity
+  let username
+
+  if (event.identity && event.identity.username) {
+    username = event.identity
+  }
+
   if (!newTodo.reminder) {
     return response(400, { message: "Reminder must be specified" });
   }
